@@ -5,6 +5,7 @@
 #include "main.h"
 #include "logger.h"
 #include "Shader.h"
+#include "Camera.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -15,11 +16,18 @@
 #define WIDTH 1280
 #define HEIGHT 720
 
+float deltaTime = 0.0f;
+float lastFrame = 0.0f;
+
 std::unique_ptr<Shader> shader;
 
 glm::mat4 model;
-glm::mat4 view;
 glm::mat4 projection;
+
+Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+float lastX = WIDTH ;
+float lastY = HEIGHT ;
+bool firstMouse = true;
 
 struct Vertex
 {
@@ -52,9 +60,11 @@ int main()
 
 	glViewport(0, 0, WIDTH, HEIGHT);
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+	glfwSetCursorPosCallback(window, mouse_callback);
+	glfwSetScrollCallback(window, scroll_callback);
 
-	view = glm::mat4(1.0f);
-	view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
 	projection = glm::perspective(glm::radians(45.0f), (float)WIDTH / (float)HEIGHT, 0.1f, 100.0f);
 
 	shader = std::make_unique<Shader>(Shader("shaders/vertex_shader.glsl", "shaders/fragment_shader.glsl"));
@@ -68,6 +78,10 @@ int main()
 	// render loop
 	while (!glfwWindowShouldClose(window))
 	{
+		float currentFrame = static_cast<float>(glfwGetTime());
+		deltaTime = currentFrame - lastFrame;
+		lastFrame = currentFrame;
+
 		processInput(window);
 
 		glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
@@ -78,7 +92,7 @@ int main()
 
 		shader->use();
 		shader->setInt("texture1", 0);
-		shader->setMat4("view", view);
+		shader->setMat4("view", camera.GetViewMatrix());
 		shader->setMat4("projection", projection);
 
 		glm::mat4 model = glm::mat4(1.0f);
@@ -105,6 +119,17 @@ void processInput(GLFWwindow* window)
 {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
+
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+		camera.ProcessKeyboard(FORWARD, deltaTime);
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+		camera.ProcessKeyboard(BACKWARD, deltaTime);
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+		camera.ProcessKeyboard(LEFT, deltaTime);
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+		camera.ProcessKeyboard(RIGHT, deltaTime);
+	camera.ProcessMouseMovement(0.0f, 0.0f);
+	camera.ProcessMouseScroll(0.0f);
 }
 
 GLuint loadTexture(std::string name) {
@@ -200,4 +225,29 @@ void drawCube(unsigned int VAO)
 	glBindVertexArray(VAO);
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 	glBindVertexArray(0);
+}
+
+void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
+{
+	float xpos = static_cast<float>(xposIn);
+	float ypos = static_cast<float>(yposIn);
+
+	if (firstMouse)
+	{
+		lastX = xpos;
+		lastY = ypos;
+		firstMouse = false;
+	}
+
+	float xoffset = xpos - lastX;
+	float yoffset = lastY - ypos; 
+	lastX = xpos;
+	lastY = ypos;
+
+	camera.ProcessMouseMovement(xoffset, yoffset);
+}
+
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+	camera.ProcessMouseScroll(static_cast<float>(yoffset));
 }
