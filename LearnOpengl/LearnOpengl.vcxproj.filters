@@ -59,5 +59,11 @@
     <Image Include="res\128.bmp">
       <Filter>Файлы ресурсов</Filter>
     </Image>
+    <Image Include="res\box_diffuse.png">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="res\box_reflect.png">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
   </ItemGroup>
 </Project>
