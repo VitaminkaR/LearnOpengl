@@ -9,10 +9,13 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 #define WIDTH 1280
 #define HEIGHT 720
 
-std::unique_ptr<Shader> shaders[1];
+std::unique_ptr<Shader> shader;
 
 struct Vertex
 {
@@ -46,7 +49,7 @@ int main()
 	glViewport(0, 0, WIDTH, HEIGHT);
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-	loadShaders();
+	shader = std::make_unique<Shader>(Shader("shaders/vertex_shader.glsl", "shaders/fragment_shader.glsl"));
 
 	unsigned int texture = loadTexture("res/128.bmp");
 
@@ -82,8 +85,6 @@ int main()
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 
-	glUniform1i(glGetUniformLocation(shaders[0]->ID, "texture1"), 0);
-
 	// render loop
 	while (!glfwWindowShouldClose(window))
 	{
@@ -94,7 +95,17 @@ int main()
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texture);
-		shaders[0]->use();
+
+		glm::mat4 transform = glm::mat4(1.0f);
+		transform = glm::translate(transform, glm::vec3(0.5f, -0.5f, 0.0f));
+		transform = glm::rotate(transform, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
+
+		shader->use();
+		shader->setInt("texture1", 0);
+
+		unsigned int transformLoc = glGetUniformLocation(shader->ID, "transform");
+		glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
+
 		glBindVertexArray(VAO);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
@@ -116,11 +127,6 @@ void processInput(GLFWwindow* window)
 {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
-}
-
-void loadShaders()
-{
-	shaders[0] = std::make_unique<Shader>(Shader("shaders/vertex_shader.glsl", "shaders/fragment_shader.glsl"));
 }
 
 GLuint loadTexture(std::string name) {
