@@ -34,6 +34,7 @@ struct Vertex
 	float position[3];
 	float color[3];
 	float texture[2];
+	float normal[3];
 };
 
 int main()
@@ -87,16 +88,28 @@ int main()
 		glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, texture);
+		/*glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, texture);*/
 
 		shader->use();
 		shader->setInt("texture1", 0);
 		shader->setMat4("view", camera.GetViewMatrix());
 		shader->setMat4("projection", projection);
 
+		shader->setVec3("lightPos", glm::vec3(1.0f, 1.0f, 1.0f));
+		shader->setVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
+		shader->setVec3("viewPos", camera.Position);
+
+		shader->setVec3("material.ambient", glm::vec3(1.0f, 0.5f, 0.31f));
+		shader->setVec3("material.diffuse", glm::vec3(1.0f, 0.5f, 0.31f));
+		shader->setVec3("material.specular", glm::vec3(0.5f, 0.5f, 0.5f));
+		shader->setFloat("material.shininess", 32.0f);
+
+		shader->setVec3("light.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
+		shader->setVec3("light.diffuse", glm::vec3(1.0f, 1.0f, 1.0f)); // darken diffuse light a bit
+		shader->setVec3("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
+
 		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(0.0f, 1.0f, 0.0f));
 		shader->setMat4("model", model);
 
 		drawCube(cubeVAO);
@@ -157,47 +170,53 @@ GLuint loadTexture(std::string name) {
 unsigned int createCube()
 {
 	Vertex vertices[] = {
-		{{-0.5f, -0.5f, -0.5f},{1.0f, 1.0f, 1.0f},{ 0.0f, 0.0f}},
-		 {{0.5f, -0.5f, -0.5f},{1.0f, 1.0f, 1.0f},{ 1.0f, 0.0f}},
-		 {{0.5f,  0.5f, -0.5f},{1.0f, 1.0f, 1.0f},{ 1.0f, 1.0f}},
-		 {{0.5f,  0.5f, -0.5f},{1.0f, 1.0f, 1.0f},{ 1.0f, 1.0f}},
-		{{-0.5f,  0.5f, -0.5f},{1.0f, 1.0f, 1.0f},{ 0.0f, 1.0f}},
-		{{-0.5f, -0.5f, -0.5f},{1.0f, 1.0f, 1.0f},{ 0.0f, 0.0f}},
+			// Back face
+			{{-0.5f, -0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f}, {0.0f, 0.0f, -1.0f}},
+			{{0.5f, -0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 0.0f}, {0.0f, 0.0f, -1.0f}},
+			{{0.5f,  0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}, {0.0f, 0.0f, -1.0f}},
+			{{0.5f,  0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}, {0.0f, 0.0f, -1.0f}},
+			{{-0.5f,  0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}, {0.0f, 0.0f, -1.0f}},
+			{{-0.5f, -0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f}, {0.0f, 0.0f, -1.0f}},
 
-		{{-0.5f, -0.5f,  0.5f},{1.0f, 1.0f, 1.0f},{ 0.0f, 0.0f}},
-		 {{0.5f, -0.5f,  0.5f},{1.0f, 1.0f, 1.0f},{ 1.0f, 0.0f}},
-		 {{0.5f,  0.5f,  0.5f},{1.0f, 1.0f, 1.0f},{ 1.0f, 1.0f}},
-		 {{0.5f,  0.5f,  0.5f},{1.0f, 1.0f, 1.0f},{ 1.0f, 1.0f}},
-		{{-0.5f,  0.5f,  0.5f},{1.0f, 1.0f, 1.0f},{ 0.0f, 1.0f}},
-		{{-0.5f, -0.5f,  0.5f},{1.0f, 1.0f, 1.0f},{ 0.0f, 0.0f}},
+			// Front face
+			{{-0.5f, -0.5f,  0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f}, {0.0f, 0.0f, 1.0f}},
+			{{0.5f, -0.5f,  0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}},
+			{{0.5f,  0.5f,  0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}, {0.0f, 0.0f, 1.0f}},
+			{{0.5f,  0.5f,  0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}, {0.0f, 0.0f, 1.0f}},
+			{{-0.5f,  0.5f,  0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}, {0.0f, 0.0f, 1.0f}},
+			{{-0.5f, -0.5f,  0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f}, {0.0f, 0.0f, 1.0f}},
 
-		{{-0.5f,  0.5f,  0.5f},{1.0f, 1.0f, 1.0f},{ 1.0f, 0.0f}},
-		{{-0.5f,  0.5f, -0.5f},{1.0f, 1.0f, 1.0f},{ 1.0f, 1.0f}},
-		{{-0.5f, -0.5f, -0.5f},{1.0f, 1.0f, 1.0f},{ 0.0f, 1.0f}},
-		{{-0.5f, -0.5f, -0.5f},{1.0f, 1.0f, 1.0f},{ 0.0f, 1.0f}},
-		{{-0.5f, -0.5f,  0.5f},{1.0f, 1.0f, 1.0f},{ 0.0f, 0.0f}},
-		{{-0.5f,  0.5f,  0.5f},{1.0f, 1.0f, 1.0f},{ 1.0f, 0.0f}},
+			// Left face
+			{{-0.5f,  0.5f,  0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 0.0f}, {-1.0f, 0.0f, 0.0f}},
+			{{-0.5f,  0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}, {-1.0f, 0.0f, 0.0f}},
+			{{-0.5f, -0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}, {-1.0f, 0.0f, 0.0f}},
+			{{-0.5f, -0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}, {-1.0f, 0.0f, 0.0f}},
+			{{-0.5f, -0.5f,  0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f}, {-1.0f, 0.0f, 0.0f}},
+			{{-0.5f,  0.5f,  0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 0.0f}, {-1.0f, 0.0f, 0.0f}},
 
-		 {{0.5f,  0.5f,  0.5f},{1.0f, 1.0f, 1.0f},{ 1.0f, 0.0f}},
-		 {{0.5f,  0.5f, -0.5f},{1.0f, 1.0f, 1.0f},{ 1.0f, 1.0f}},
-		 {{0.5f, -0.5f, -0.5f},{1.0f, 1.0f, 1.0f},{ 0.0f, 1.0f}},
-		 {{0.5f, -0.5f, -0.5f},{1.0f, 1.0f, 1.0f},{ 0.0f, 1.0f}},
-		 {{0.5f, -0.5f,  0.5f},{1.0f, 1.0f, 1.0f},{ 0.0f, 0.0f}},
-		 {{0.5f,  0.5f,  0.5f},{1.0f, 1.0f, 1.0f},{ 1.0f, 0.0f}},
+			// Right face
+			{{0.5f,  0.5f,  0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 0.0f}, {1.0f, 0.0f, 0.0f}},
+			{{0.5f,  0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}, {1.0f, 0.0f, 0.0f}},
+			{{0.5f, -0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}, {1.0f, 0.0f, 0.0f}},
+			{{0.5f, -0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}, {1.0f, 0.0f, 0.0f}},
+			{{0.5f, -0.5f,  0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f}, {1.0f, 0.0f, 0.0f}},
+			{{0.5f,  0.5f,  0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 0.0f}, {1.0f, 0.0f, 0.0f}},
 
-		{{-0.5f, -0.5f, -0.5f},{1.0f, 1.0f, 1.0f},{ 0.0f, 1.0f}},
-		 {{0.5f, -0.5f, -0.5f},{1.0f, 1.0f, 1.0f},{ 1.0f, 1.0f}},
-		 {{0.5f, -0.5f,  0.5f},{1.0f, 1.0f, 1.0f},{ 1.0f, 0.0f}},
-		 {{0.5f, -0.5f,  0.5f},{1.0f, 1.0f, 1.0f},{ 1.0f, 0.0f}},
-		{{-0.5f, -0.5f,  0.5f},{1.0f, 1.0f, 1.0f},{ 0.0f, 0.0f}},
-		{{-0.5f, -0.5f, -0.5f},{1.0f, 1.0f, 1.0f},{ 0.0f, 1.0f}},
+			// Bottom face
+			{{-0.5f, -0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}, {0.0f, -1.0f, 0.0f}},
+			{{0.5f, -0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}, {0.0f, -1.0f, 0.0f}},
+			{{0.5f, -0.5f,  0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 0.0f}, {0.0f, -1.0f, 0.0f}},
+			{{0.5f, -0.5f,  0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 0.0f}, {0.0f, -1.0f, 0.0f}},
+			{{-0.5f, -0.5f,  0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f}, {0.0f, -1.0f, 0.0f}},
+			{{-0.5f, -0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}, {0.0f, -1.0f, 0.0f}},
 
-		{{-0.5f,  0.5f, -0.5f},{1.0f, 1.0f, 1.0f},{ 0.0f, 1.0f}},
-		 {{0.5f,  0.5f, -0.5f},{1.0f, 1.0f, 1.0f},{ 1.0f, 1.0f}},
-		 {{0.5f,  0.5f,  0.5f},{1.0f, 1.0f, 1.0f},{ 1.0f, 0.0f}},
-		 {{0.5f,  0.5f,  0.5f},{1.0f, 1.0f, 1.0f},{ 1.0f, 0.0f}},
-		{{-0.5f,  0.5f,  0.5f},{1.0f, 1.0f, 1.0f},{ 0.0f, 0.0f}},
-		{{-0.5f,  0.5f, -0.5f},{1.0f, 1.0f, 1.0f},{ 0.0f, 1.0f}}
+			// Top face
+			{{-0.5f,  0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}, {0.0f, 1.0f, 0.0f}},
+			{{0.5f,  0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}, {0.0f, 1.0f, 0.0f}},
+			{{0.5f,  0.5f,  0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 0.0f}, {0.0f, 1.0f, 0.0f}},
+			{{0.5f,  0.5f,  0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 0.0f}, {0.0f, 1.0f, 0.0f}},
+			{{-0.5f,  0.5f,  0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}},
+			{{-0.5f,  0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}, {0.0f, 1.0f, 0.0f}}
 	};
 	unsigned int VBO, VAO;
 	glGenVertexArrays(1, &VAO);
@@ -207,12 +226,14 @@ unsigned int createCube()
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(6 * sizeof(float)));
 	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(8 * sizeof(float)));
+	glEnableVertexAttribArray(3);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
