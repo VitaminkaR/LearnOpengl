@@ -103,13 +103,15 @@ int main()
 		shader->setVec3("dirLight.diffuse", 0.4f, 0.4f, 0.4f);
 		shader->setVec3("dirLight.specular", 0.5f, 0.5f, 0.5f);
 		// point light 1
-		shader->setVec3("pointLights[0].position", 0.7f, 0.2f, 2.0f);
+		shader->setVec3("pointLights[0].position", 0, 0, 2);
+		shader->setVec3("pointLights[0].spotDirection", 0, 0, -2);
 		shader->setVec3("pointLights[0].ambient", 0.05f, 0.05f, 0.05f);
 		shader->setVec3("pointLights[0].diffuse", 0.8f, 0.8f, 0.8f);
 		shader->setVec3("pointLights[0].specular", 1.0f, 1.0f, 1.0f);
 		shader->setFloat("pointLights[0].constant", 1.0f);
 		shader->setFloat("pointLights[0].linear", 0.09f);
 		shader->setFloat("pointLights[0].quadratic", 0.032f);
+		shader->setFloat("pointLights[0].spotCutoff", 15);
 		shader->setInt("pointLightCount", 1);
 
 		shader->setVec3("viewPos", camera.Position);

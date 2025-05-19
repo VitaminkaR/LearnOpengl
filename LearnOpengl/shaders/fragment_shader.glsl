@@ -25,10 +25,12 @@ uniform DirLight dirLight;
 
 struct PointLight {    
     vec3 position;
+    vec3 spotDirection;
     
     float constant;
     float linear;
     float quadratic;  
+    float spotCutoff;
 
     vec3 ambient;
     vec3 diffuse;
@@ -66,6 +68,12 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     float distance    = length(light.position - fragPos);
     float attenuation = 1.0 / (light.constant + light.linear * distance + 
   			     light.quadratic * (distance * distance));    
+
+    float angle = dot(normalize(light.spotDirection), -normalize(lightDir));
+    angle = max(angle,0); 
+   if(light.spotCutoff <= 90 && acos(angle) > radians(light.spotCutoff))
+       return vec3(0);
+
     // combine results
     vec3 ambient  = light.ambient  * vec3(texture(material.diffuse, TexCoords));
     vec3 diffuse  = light.diffuse  * diff * vec3(texture(material.diffuse, TexCoords));
