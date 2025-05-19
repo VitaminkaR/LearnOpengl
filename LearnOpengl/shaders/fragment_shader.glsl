@@ -14,18 +14,12 @@ struct Material {
 }; 
 uniform Material material;
 
-struct DirLight {
-    vec3 direction;
-  
-    vec3 ambient;
-    vec3 diffuse;
-    vec3 specular;
-};  
-uniform DirLight dirLight;
+struct LightSource
+{
+    int isDirLight;
 
-struct PointLight {    
     vec3 position;
-    vec3 spotDirection;
+    vec3 direction;
     
     float constant;
     float linear;
@@ -35,13 +29,12 @@ struct PointLight {
     vec3 ambient;
     vec3 diffuse;
     vec3 specular;
-};  
-#define NR_POINT_LIGHTS 4  
-uniform PointLight pointLights[NR_POINT_LIGHTS];
+};
+#define MAX_LIGHT_SOURCE 4  
+uniform LightSource lightSources[MAX_LIGHT_SOURCE];
+uniform int enabledLightSourceCount;
 
-uniform int pointLightCount;
-
-vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir)
+vec3 CalcDirLight(LightSource light, vec3 normal, vec3 viewDir)
 {
     vec3 lightDir = normalize(-light.direction);
     // diffuse shading
@@ -56,7 +49,7 @@ vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir)
     return (ambient + diffuse + specular);
 }  
 
-vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
+vec3 CalcPointLight(LightSource light, vec3 normal, vec3 fragPos, vec3 viewDir)
 {
     vec3 lightDir = normalize(light.position - fragPos);
     // diffuse shading
@@ -69,7 +62,7 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     float attenuation = 1.0 / (light.constant + light.linear * distance + 
   			     light.quadratic * (distance * distance));    
 
-    float angle = dot(normalize(light.spotDirection), -normalize(lightDir));
+    float angle = dot(normalize(light.direction), -normalize(lightDir));
     angle = max(angle,0); 
    if(light.spotCutoff <= 90 && acos(angle) > radians(light.spotCutoff))
        return vec3(0);
@@ -89,11 +82,16 @@ void main()
     // properties
     vec3 norm = normalize(Normal);
     vec3 viewDir = normalize(viewPos - FragPos);
+    vec3 result = vec3(0);
 
-    vec3 result = CalcDirLight(dirLight, norm, viewDir);
-
-    for(int i = 0; i < pointLightCount; i++)
-        result += CalcPointLight(pointLights[i], norm, FragPos, viewDir);   
+    for(int i = 0; i < enabledLightSourceCount; i++)
+    {
+        LightSource light = lightSources[i];
+        if(light.isDirLight == 1)
+            result += CalcDirLight(light, norm, viewDir);
+        else
+            result += CalcPointLight(light, norm, FragPos, viewDir);   
+    }
     
     FragColor = vec4(result, 1.0);
 } 

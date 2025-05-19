@@ -98,21 +98,24 @@ int main()
 		shader->setMat4("projection", projection);
 
 		// directional light
-		shader->setVec3("dirLight.direction", -0.2f, -1.0f, -0.3f);
-		shader->setVec3("dirLight.ambient", 0.05f, 0.05f, 0.05f);
-		shader->setVec3("dirLight.diffuse", 0.4f, 0.4f, 0.4f);
-		shader->setVec3("dirLight.specular", 0.5f, 0.5f, 0.5f);
+		shader->setInt("lightSources[0].isDirLight", 1);
+		shader->setVec3("lightSources[0].direction", -0.2f, -1.0f, -0.3f);
+		shader->setVec3("lightSources[0].ambient", 0.05f, 0.05f, 0.05f);
+		shader->setVec3("lightSources[0].diffuse", 0.4f, 0.4f, 0.4f);
+		shader->setVec3("lightSources[0].specular", 0.5f, 0.5f, 0.5f);
 		// point light 1
-		shader->setVec3("pointLights[0].position", 0, 0, 2);
-		shader->setVec3("pointLights[0].spotDirection", 0, 0, -2);
-		shader->setVec3("pointLights[0].ambient", 0.05f, 0.05f, 0.05f);
-		shader->setVec3("pointLights[0].diffuse", 0.8f, 0.8f, 0.8f);
-		shader->setVec3("pointLights[0].specular", 1.0f, 1.0f, 1.0f);
-		shader->setFloat("pointLights[0].constant", 1.0f);
-		shader->setFloat("pointLights[0].linear", 0.09f);
-		shader->setFloat("pointLights[0].quadratic", 0.032f);
-		shader->setFloat("pointLights[0].spotCutoff", 15);
-		shader->setInt("pointLightCount", 1);
+		shader->setInt("lightSources[1].isDirLight", 0);
+		shader->setVec3("lightSources[1].position", 0, 0, 2);
+		shader->setVec3("lightSources[1].direction", 0, 0, -2);
+		shader->setVec3("lightSources[1].ambient", 0.05f, 0.05f, 0.05f);
+		shader->setVec3("lightSources[1].diffuse", 0.8f, 0.8f, 0.8f);
+		shader->setVec3("lightSources[1].specular", 1.0f, 1.0f, 1.0f);
+		shader->setFloat("lightSources[1].constant", 1.0f);
+		shader->setFloat("lightSources[1].linear", 0.09f);
+		shader->setFloat("lightSources[1].quadratic", 0.032f);
+		shader->setFloat("lightSources[1].spotCutoff", 15);
+
+		shader->setInt("enabledLightSourceCount", 2);
 
 		shader->setVec3("viewPos", camera.Position);
 		shader->setInt("material.diffuse", 0);
