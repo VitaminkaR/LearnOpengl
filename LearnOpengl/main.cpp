@@ -97,18 +97,25 @@ int main()
 		shader->setMat4("view", camera.GetViewMatrix());
 		shader->setMat4("projection", projection);
 
-		shader->setVec3("lightPos", glm::vec3(1.0f, 1.0f, 1.0f));
-		shader->setVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
+		// directional light
+		shader->setVec3("dirLight.direction", -0.2f, -1.0f, -0.3f);
+		shader->setVec3("dirLight.ambient", 0.05f, 0.05f, 0.05f);
+		shader->setVec3("dirLight.diffuse", 0.4f, 0.4f, 0.4f);
+		shader->setVec3("dirLight.specular", 0.5f, 0.5f, 0.5f);
+		// point light 1
+		shader->setVec3("pointLights[0].position", 0.7f, 0.2f, 2.0f);
+		shader->setVec3("pointLights[0].ambient", 0.05f, 0.05f, 0.05f);
+		shader->setVec3("pointLights[0].diffuse", 0.8f, 0.8f, 0.8f);
+		shader->setVec3("pointLights[0].specular", 1.0f, 1.0f, 1.0f);
+		shader->setFloat("pointLights[0].constant", 1.0f);
+		shader->setFloat("pointLights[0].linear", 0.09f);
+		shader->setFloat("pointLights[0].quadratic", 0.032f);
+		shader->setInt("pointLightCount", 1);
+
 		shader->setVec3("viewPos", camera.Position);
-
 		shader->setInt("material.diffuse", 0);
-		shader->setInt("material.specular", 1);
-		shader->setVec3("material.specular", glm::vec3(0.5f, 0.5f, 0.5f));
+		shader->setInt("material.specular", 1);	
 		shader->setFloat("material.shininess", 32.0f);
-
-		shader->setVec3("light.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
-		shader->setVec3("light.diffuse", glm::vec3(1.0f, 1.0f, 1.0f));
-		shader->setVec3("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
 
 		glm::mat4 model = glm::mat4(1.0f);
 		shader->setMat4("model", model);
