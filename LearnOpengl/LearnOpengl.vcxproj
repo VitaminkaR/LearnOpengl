@@ -130,6 +130,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BasicLightning.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="glad.c" />
     <ClCompile Include="logger.cpp" />
@@ -137,6 +138,7 @@
     <ClCompile Include="Shader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BasicLightning.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="logger.h" />
     <ClInclude Include="main.h" />
@@ -145,8 +147,8 @@
     <ClInclude Include="stb_image.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="shaders\fragment_shader.glsl" />
-    <None Include="shaders\vertex_shader.glsl" />
+    <None Include="shaders\basic_lightningfs.glsl" />
+    <None Include="shaders\basic_lightningvs.glsl" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\128.bmp" />

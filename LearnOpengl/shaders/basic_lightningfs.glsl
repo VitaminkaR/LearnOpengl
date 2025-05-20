@@ -30,7 +30,7 @@ struct LightSource
     vec3 diffuse;
     vec3 specular;
 };
-#define MAX_LIGHT_SOURCE 4  
+#define MAX_LIGHT_SOURCE 8 
 uniform LightSource lightSources[MAX_LIGHT_SOURCE];
 uniform int enabledLightSourceCount;
 

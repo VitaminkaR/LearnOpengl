@@ -30,6 +30,9 @@
     <ClCompile Include="Camera.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="BasicLightning.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -50,10 +53,13 @@
     <ClInclude Include="Camera.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
+    <ClInclude Include="BasicLightning.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="shaders\vertex_shader.glsl" />
-    <None Include="shaders\fragment_shader.glsl" />
+    <None Include="shaders\basic_lightningvs.glsl" />
+    <None Include="shaders\basic_lightningfs.glsl" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\128.bmp">

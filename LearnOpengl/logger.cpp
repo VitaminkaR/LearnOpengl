@@ -4,54 +4,59 @@
 #include <stdio.h>
 #include <stdarg.h>
 
-void setColor(const char* color) 
+namespace LOGL
 {
-	std::cout << "\033[" << color << "m";
-}
 
-void resetColor() 
-{
-	std::cout << "\033[0m";
-}
+	void setColor(const char* color)
+	{
+		std::cout << "\033[" << color << "m";
+	}
 
-void log(const char* str, ...) 
-{
-	setColor(COLOR_GREEN);
-	std::cout << "[LOG] ";
+	void resetColor()
+	{
+		std::cout << "\033[0m";
+	}
 
-	va_list args;
-	va_start(args, str);
-	vprintf(str, args);
-	va_end(args);
-	std::cout << std::endl;
+	void log(const char* str, ...)
+	{
+		setColor(COLOR_GREEN);
+		std::cout << "[LOG] ";
 
-	resetColor();
-}
+		va_list args;
+		va_start(args, str);
+		vprintf(str, args);
+		va_end(args);
+		std::cout << std::endl;
 
-void error(const char* str, ...) 
-{
-	setColor(COLOR_RED);
-	std::cout << "[ERROR] ";
+		resetColor();
+	}
 
-	va_list args;
-	va_start(args, str);
-	vprintf(str, args);
-	va_end(args);
-	std::cout << std::endl;
+	void error(const char* str, ...)
+	{
+		setColor(COLOR_RED);
+		std::cout << "[ERROR] ";
 
-	resetColor();
-}
+		va_list args;
+		va_start(args, str);
+		vprintf(str, args);
+		va_end(args);
+		std::cout << std::endl;
 
-void warning(const char* str, ...) 
-{
-	setColor(COLOR_YELLOW);
+		resetColor();
+	}
 
-	std::cout << "[WARNING] ";
-	va_list args;
-	va_start(args, str);
-	vprintf(str, args);
-	va_end(args);
-	std::cout << std::endl;
+	void warning(const char* str, ...)
+	{
+		setColor(COLOR_YELLOW);
 
-	resetColor();
+		std::cout << "[WARNING] ";
+		va_list args;
+		va_start(args, str);
+		vprintf(str, args);
+		va_end(args);
+		std::cout << std::endl;
+
+		resetColor();
+	}
+
 }

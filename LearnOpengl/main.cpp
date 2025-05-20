@@ -4,8 +4,7 @@
 
 #include "main.h"
 #include "logger.h"
-#include "Shader.h"
-#include "Camera.h"
+#include "BasicLightning.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -46,7 +45,7 @@ int main()
 	GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "LearnOpenGL", NULL, NULL);
 	if (window == NULL)
 	{
-		error("Failed to create GLFW window");
+		LOGL::error("Failed to create GLFW window");
 		glfwTerminate();
 		return -1;
 	}
@@ -54,7 +53,7 @@ int main()
 
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 	{
-		error("Failed to initialize GLAD");
+		LOGL::error("Failed to initialize GLAD");
 		return -1;
 	}
 
@@ -67,7 +66,22 @@ int main()
 
 	projection = glm::perspective(glm::radians(45.0f), (float)WIDTH / (float)HEIGHT, 0.1f, 100.0f);
 
-	shader = std::make_unique<Shader>(Shader("shaders/vertex_shader.glsl", "shaders/fragment_shader.glsl"));
+	BasicLightning basicLightning;
+	basicLightning.init();
+	LightSource dirls;
+	dirls.isDirLight = true;
+	dirls.direction = glm::vec3(0.0f, -1.0f, 0.0f);
+	dirls.ambient = glm::vec3(0.2f, 0.2f, 0.2f);
+	dirls.diffuse = glm::vec3(1.0f, 1.0f, 1.0f);
+	dirls.specular = glm::vec3(1.0f, 1.0f, 1.0f);
+	basicLightning.addLightSource(dirls);
+	dirls.isDirLight = false;
+	dirls.position = glm::vec3(-1.0f, 1.0f, 1.0f);
+	dirls.direction = glm::vec3(0.0f, -1.0f, 0.0f);
+	dirls.ambient = glm::vec3(0.2f, 0.2f, 0.2f);
+	dirls.diffuse = glm::vec3(1.0f, 0.0f, 0.0f);
+	dirls.specular = glm::vec3(1.0f, 1.0f, 1.0f);
+	basicLightning.addLightSource(dirls);
 
 	unsigned int texBoxDiffuse = loadTexture("res/box_diffuse.png");
 	unsigned int texBoxReflect = loadTexture("res/box_reflect.png");
@@ -88,43 +102,14 @@ int main()
 		glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+		basicLightning.use(camera, projection);
+
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texBoxDiffuse);
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, texBoxReflect);
-
-		shader->use();
-		shader->setMat4("view", camera.GetViewMatrix());
-		shader->setMat4("projection", projection);
-
-		// directional light
-		shader->setInt("lightSources[0].isDirLight", 1);
-		shader->setVec3("lightSources[0].direction", -0.2f, -1.0f, -0.3f);
-		shader->setVec3("lightSources[0].ambient", 0.05f, 0.05f, 0.05f);
-		shader->setVec3("lightSources[0].diffuse", 0.4f, 0.4f, 0.4f);
-		shader->setVec3("lightSources[0].specular", 0.5f, 0.5f, 0.5f);
-		// point light 1
-		shader->setInt("lightSources[1].isDirLight", 0);
-		shader->setVec3("lightSources[1].position", 0, 0, 2);
-		shader->setVec3("lightSources[1].direction", 0, 0, -2);
-		shader->setVec3("lightSources[1].ambient", 0.05f, 0.05f, 0.05f);
-		shader->setVec3("lightSources[1].diffuse", 0.8f, 0.8f, 0.8f);
-		shader->setVec3("lightSources[1].specular", 1.0f, 1.0f, 1.0f);
-		shader->setFloat("lightSources[1].constant", 1.0f);
-		shader->setFloat("lightSources[1].linear", 0.09f);
-		shader->setFloat("lightSources[1].quadratic", 0.032f);
-		shader->setFloat("lightSources[1].spotCutoff", 15);
-
-		shader->setInt("enabledLightSourceCount", 2);
-
-		shader->setVec3("viewPos", camera.Position);
-		shader->setInt("material.diffuse", 0);
-		shader->setInt("material.specular", 1);	
-		shader->setFloat("material.shininess", 32.0f);
-
 		glm::mat4 model = glm::mat4(1.0f);
-		shader->setMat4("model", model);
-
+		basicLightning.setModelMat(model);
 		drawCube(cubeVAO);
 
 		glfwPollEvents();
