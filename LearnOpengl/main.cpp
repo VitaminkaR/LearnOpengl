@@ -22,12 +22,10 @@
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
-std::unique_ptr<Shader> shader;
-
 glm::mat4 model;
 glm::mat4 projection;
 
-Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+LOGL::Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 float lastX = WIDTH;
 float lastY = HEIGHT;
 bool firstMouse = true;
@@ -41,7 +39,7 @@ struct Vertex
 
 bool isMenuOpened = false;
 
-BasicLightning basicLightning;
+LOGL::BasicLightning basicLightning;
 unsigned int texBoxDiffuse;
 unsigned int texBoxReflect;
 unsigned int cubeVAO;
@@ -86,7 +84,7 @@ int main()
 	projection = glm::perspective(glm::radians(45.0f), (float)WIDTH / (float)HEIGHT, 0.1f, 100.0f);
 
 	basicLightning.init();
-	LightSource dirls;
+	LOGL::LightSource dirls;
 	dirls.isDirLight = true;
 	dirls.direction = glm::vec3(0.0f, -1.0f, 0.0f);
 	dirls.ambient = glm::vec3(0.2f, 0.2f, 0.2f);
@@ -168,13 +166,17 @@ void processInput(GLFWwindow* window)
 		f1KeyRepeatFlag = false;
 
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-		camera.ProcessKeyboard(FORWARD, deltaTime);
+		camera.ProcessKeyboard(LOGL::FORWARD, deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-		camera.ProcessKeyboard(BACKWARD, deltaTime);
+		camera.ProcessKeyboard(LOGL::BACKWARD, deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-		camera.ProcessKeyboard(LEFT, deltaTime);
+		camera.ProcessKeyboard(LOGL::LEFT, deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-		camera.ProcessKeyboard(RIGHT, deltaTime);
+		camera.ProcessKeyboard(LOGL::RIGHT, deltaTime);
+	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+		camera.ProcessKeyboard(LOGL::UP, deltaTime);
+	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+		camera.ProcessKeyboard(LOGL::DOWN, deltaTime);
 }
 
 GLuint loadTexture(std::string name) {
