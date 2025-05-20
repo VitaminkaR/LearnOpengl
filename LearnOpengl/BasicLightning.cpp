@@ -16,7 +16,7 @@ namespace LOGL
 		m_Shader->setFloat("material.shininess", 32.0f);
 	}
 
-	void BasicLightning::use(Camera camera, glm::mat4 proj)
+	void BasicLightning::use(Camera& camera, glm::mat4& proj)
 	{
 		m_Shader->use();
 
@@ -25,12 +25,12 @@ namespace LOGL
 		m_Shader->setVec3("viewPos", camera.Position);
 	}
 
-	void BasicLightning::setModelMat(glm::mat4 model)
+	void BasicLightning::setModelMat(glm::mat4& model)
 	{
 		m_Shader->setMat4("model", model);
 	}
 
-	void BasicLightning::addLightSource(LightSource ls)
+	void BasicLightning::addLightSource(LightSource& ls)
 	{
 		if (m_Lights.size() == MAX_LIGHT_SOURCE)
 		{
@@ -42,7 +42,7 @@ namespace LOGL
 		editLightSource(m_Lights.size() - 1, ls);
 	}
 
-	void BasicLightning::editLightSource(int ID, LightSource ls)
+	void BasicLightning::editLightSource(int ID, LightSource& ls)
 	{
 		if (ID < 0 && ID > MAX_LIGHT_SOURCE)
 		{

@@ -32,11 +32,11 @@ namespace LOGL
     public:
         BasicLightning();
         void init();
-        void use(Camera camera, glm::mat4 proj);
-        void setModelMat(glm::mat4 model);
+        void use(Camera& camera, glm::mat4& proj);
+        void setModelMat(glm::mat4& model);
 
-        void addLightSource(LightSource ls);
-        void editLightSource(int ID, LightSource ls);
+        void addLightSource(LightSource& ls);
+        void editLightSource(int ID, LightSource& ls);
         void removeLightSource(int ID);
         LightSource* getLightSource(int ID);
     private:
